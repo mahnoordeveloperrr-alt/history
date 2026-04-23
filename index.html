@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+  <title>Chronicle · The Historical Gazette | Archive with "See More"</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;900&family=Georgia&family=Libre+Baskerville:ital@0;1&family=Special+Elite&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #EFE6D6;
+      font-family: 'Georgia', 'Libre Baskerville', serif;
+      color: #1C1C1C;
+      scroll-behavior: smooth;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(200,180,150,0.02) 0px, rgba(200,180,150,0.02) 2px, transparent 2px, transparent 6px),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.12"/></svg>');
+      pointer-events: none; z-index: 9999; mix-blend-mode: multiply;
+    }
+    .grain-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 30%, rgba(139, 58, 58, 0.02) 0%, transparent 50%);
+      pointer-events: none; z-index: 9998;
+    }
+    h1, h2, h3, h4, .serif-heading { font-family: 'Playfair Display', 'Cinzel', serif; letter-spacing: 0.03em; }
+    .typewriter { font-family: 'Special Elite', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 2.5px; font-size: 0.75rem; }
+    .vintage-card {
+      background-color: #F8F1E4;
+      box-shadow: 5px 5px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(184,155,115,0.15), inset 0 0 0 1px rgba(255,255,240,0.5);
+      transition: all 0.3s; border: 1px solid #d6c9b8;
+    }
+    .dark-card { background-color: #2B2B2B; color: #f0e8d8; box-shadow: 7px 7px 0 rgba(0,0,0,0.08), inset 0 0 0 1px #4a3f2f; border: 1px solid #5e5340; }
+    .grid-hover { transition: transform 0.25s ease, box-shadow 0.3s; }
+    .grid-hover:hover { transform: translateY(-4px) scale(1.01); box-shadow: 10px 12px 20px rgba(0,0,0,0.12), 0 0 0 1px #C2A46D; }
+    .accent-red { color: #8B3A3A; }
+    .newspaper-border { border-top: 3px double #2B2B2B; border-bottom: 3px double #2B2B2B; }
+    .drop-cap::first-letter { font-size: 3.5em; float: left; padding: 0.1em 0.1em 0 0; line-height: 0.8; font-family: 'Playfair Display', serif; color: #8B3A3A; font-weight: 700; }
+    .timeline-dot { background-color: #8B3A3A; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #C2A46D; box-shadow: 0 0 0 2px #F8F1E4; }
+    .sepia-img { filter: sepia(0.6) contrast(1.1) brightness(0.9) grayscale(0.2); transition: filter 0.4s; }
+    .sepia-img:hover { filter: sepia(0.8) contrast(1.2) brightness(0.95); }
+    .ornament { display: flex; align-items: center; gap: 8px; color: #8B3A3A; }
+    .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #C2A46D, transparent); }
+    .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .stamp { position: absolute; bottom: 8px; right: 12px; font-family: 'Special Elite', monospace; font-size: 10px; color: #8B3A3A; border: 2px solid #8B3A3A; padding: 2px 8px; transform: rotate(-5deg); opacity: 0.5; text-transform: uppercase; pointer-events: none; }
+    .article-modal { background: #F8F1E4; border: 8px double #2B2B2B; box-shadow: 25px 25px 40px rgba(0,0,0,0.4); max-width: 950px; position: relative; }
+    .max-w-7xl { max-width: 80rem; }
+    .section-title {
+      font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
+      border-bottom: 2px solid #8C2F2F; display: inline-block; padding-bottom: 0.5rem; margin-bottom: 2rem;
+    }
+    .era-grid {
+      display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem;
+    }
+    .era-box {
+      background: #f3ecde; border: 2px solid #6e553d; padding: 0.8rem 1.5rem;
+      box-shadow: 4px 4px 0 #9b846a; font-family: 'Courier New', monospace;
+      text-transform: uppercase; font-weight: bold; font-size: 1rem;
+      transition: 0.1s; text-align: center; flex: 0 1 auto;
+    }
+    .era-box i { margin-right: 8px; color: #8B3A3A; }
+    .era-box:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #7a5e44; }
+    @media (max-width: 768px) {
+      .era-box { width: calc(50% - 0.5rem); justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .era-box { width: 100%; }
+    }
+    .see-more-btn {
+      transition: all 0.2s;
+    }
+    .see-more-btn:hover {
+      background: #2B2B2B;
+      color: #EFE6D6;
+      border-color: #C2A46D;
+    }
+  </style>
+</head>
+<body class="antialiased p-4 md:p-6 lg:p-8 relative">
+<div class="grain-overlay"></div>
+<div class="max-w-7xl mx-auto relative z-10">
+
+  <header class="newspaper-border py-4 mb-10 flex flex-wrap items-center justify-between relative">
+    <div class="typewriter text-sm md:text-base text-[#5C5C5C] w-28 md:w-auto flex items-center gap-1">
+      <i class="far fa-newspaper text-[#C2A46D]"></i>
+      <span id="vintageDate">16 APRIL 1923</span>
+    </div>
+    <div class="text-center flex-1 relative">
+      <div class="ornament absolute left-0 right-0 -top-3 opacity-40">
+        <span class="ornament-line"></span><i class="fas fa-archive text-[#C2A46D] text-xs"></i><span class="ornament-line"></span>
+      </div>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-[.15em] leading-none" style="font-family: 'Cinzel', 'Playfair Display', serif;">CHRONICLE</h1>
+      <div class="typewriter text-[10px] md:text-xs text-[#5C5C5C] tracking-[.35em] -mt-1 flex justify-center items-center gap-3">
+        <span>✦</span> THE HISTORICAL RECORD <span>✦</span>
+      </div>
+    </div>
+    <div class="w-28 text-right typewriter text-sm text-[#5C5C5C] hidden md:block"><i class="fas fa-bars mr-1"></i> EDITIONS</div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min mb-20">
+    <div class="md:row-span-1 vintage-card dark-card grid-hover p-6 flex flex-col justify-between relative overflow-hidden fade-up" style="background-color: #2B2B2B;">
+      <div>
+        <span class="typewriter text-[#C2A46D] text-xs border-b border-[#C2A46D] pb-1 inline-block mb-4"><i class="fas fa-crown mr-1"></i> FEATURED · EMPIRES</span>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight drop-cap hero-title-colored" style="font-family: 'Playfair Display', serif;">The Fall of Empires Begins in Silence</h2>
+        <p class="text-[#d4cdbc] text-base md:text-lg mt-4 leading-relaxed">Before the banners fell, the archives whispered. A century of quiet decay — unseen by those who cheered in the forums.</p>
+      </div>
+      <div class="mt-6 flex justify-between items-end">
+        <span class="typewriter text-xs text-[#C2A46D]">— FROM THE VAULT · VOL. XII</span>
+        <i class="fas fa-feather-alt text-[#C2A46D] opacity-60"></i>
+      </div>
+      <div class="stamp">ARCHIVE COPY</div>
+    </div>
+
+    <div class="vintage-card grid-hover overflow-hidden p-2 flex items-center justify-center bg-[#d6cdbc] relative fade-up">
+      <img src="https://images.unsplash.com/photo-1558449028-b53a89d2a9c3?w=800&auto=format" alt="Colosseum ruins" class="w-full h-64 md:h-72 object-cover sepia-img border-4 border-[#F8F1E4] shadow-inner">
+      <div class="absolute bottom-3 left-3 bg-[#2B2B2B]/85 text-white typewriter text-[11px] px-3 py-1.5 tracking-wider shadow-md flex items-center gap-1"><i class="fas fa-camera-retro"></i> PHOTOGRAPH · 1894</div>
+      <div class="absolute top-3 right-3 bg-[#8B3A3A]/70 text-white text-[9px] px-2 py-0.5 typewriter">ARCHIVE PLATE VII</div>
+    </div>
+
+    <div class="vintage-card grid-hover p-5 flex flex-col fade-up">
+      <div class="flex items-start gap-4">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=150&auto=format" class="w-20 h-20 object-cover sepia-img border-2 border-[#C2A46D] shadow-md" alt="Rome Colosseum">
+          <span class="absolute -bottom-1 -right-1 bg-[#8B3A3A] text-white text-[8px] px-1 typewriter">NEW</span>
+        </div>
+        <div>
+          <span class="typewriter text-[#8B3A3A] text-[10px] tracking-wider">DAILY LIFE</span>
+          <h3 class="text-2xl font-bold leading-tight mt-1" style="font-family: 'Playfair Display';">Life in Ancient Rome</h3>
+        </div>
+      </div>
+      <p class="text-sm text-[#3a3a3a] mt-4 italic border-l-2 border-[#C2A46D] pl-3">From the bustling Subura to the silent Palatine, every corner had a story.</p>
+      <a href="#" class="article-link mt-4 text-[#8B3A3A] typewriter text-xs inline-flex items-center gap-1 border-b border-[#8B3A3A] w-fit hover:gap-2 transition-all" data-article="rome">READ FULL STORY <i class="fas fa-arrow-right text-[10px]"></i></a>
+      <div class="mt-3 text-right"><span class="typewriter text-[10px] text-[#5C5C5C]">~ 7 min read</span></div>
+    </div>
+
+    <div class="vintage-card grid-hover p-6 md:col-start-3 md:row-start-2 relative fade-up">
+      <div class="flex items-center gap-2 border-b-2 border-[#C2A46D] pb-2 mb-4">
+        <i class="fas fa-hourglass-half text-[#8B3A3A]"></i>
+        <h4 class="typewriter text-[#8B3A3A] text-base tracking-wider">⚡ QUICK FACTS</h4>
+      </div>
+      <ul class="space-y-3 text-sm">
+        <li class="flex items-center gap-2 border-b border-dashed border-[#d4cdbc] pb-2"><span class="font-bold accent-red w-16">1440</span> First printing press</li>
+        <li class="flex items-center gap-2 border-b border-dashed border-[#d4cdbc] pb-2"><span class="font-bold accent-red w-16">1000+ yrs</span> Roman Empire</li>
+        <li class="flex items-center gap-2 border-b border-dashed border-[#d4cdbc] pb-2"><span class="font-bold accent-red w-16">1914</span> Sarajevo</li>
+        <li class="flex items-center gap-2"><span class="font-bold accent-red w-16">476</span> Fall of West Rome</li>
+      </ul>
+      <div class="mt-5 typewriter text-[10px] text-[#5C5C5C]"><i class="fas fa-check-circle text-[#C2A46D] mr-1"></i> verified by archive</div>
+      <div class="absolute -top-2 -right-2 w-8 h-8 bg-[#8B3A3A] rounded-full flex items-center justify-center text-white text-xs shadow-md"><i class="fas fa-scroll"></i></div>
+    </div>
+
+    <div class="dark-card grid-hover p-6 flex flex-col relative fade-up" style="background-color: #2B2B2B;">
+      <div class="flex items-center gap-3 border-b border-[#C2A46D]/40 pb-3 mb-3"><i class="fas fa-pen-nib text-[#C2A46D] text-xl"></i><span class="typewriter text-[#C2A46D] text-sm">✒ CHRONICLE EDITOR</span></div>
+      <p class="text-base leading-relaxed text-[#e0d7c5] drop-cap">Chronicle explores untold stories from the shadows of history.</p>
+      <div class="mt-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full border-2 border-[#C2A46D] flex items-center justify-center text-[#C2A46D] text-lg"><i class="fas fa-feather-alt"></i></div><div><span class="typewriter text-sm text-[#C2A46D]">E. HAWTHORNE</span><br><span class="text-[10px] text-[#a99e8c]">SENIOR HISTORIAN</span></div></div>
+    </div>
+
+    <div class="vintage-card grid-hover p-6 flex items-center justify-between bg-[#F8F1E4] border-2 border-[#C2A46D] relative fade-up">
+      <div><h3 class="text-3xl font-bold serif-heading tracking-tight">Explore More Stories</h3><p class="text-sm typewriter text-[#5C5C5C] mt-1">The archive awaits</p></div>
+      <div class="text-4xl text-[#8B3A3A]"><i class="fas fa-arrow-right"></i></div>
+      <div class="absolute -top-1 -left-1 w-6 h-6 bg-[#8B3A3A] rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- EXPLORE BY ERA -->
+  <section class="mb-16 fade-up">
+    <h2 class="section-title"><i class="fas fa-tags mr-2"></i> Explore by Era</h2>
+    <div class="era-grid">
+      <div class="era-box"><i class="fas fa-landmark"></i> Ancient</div>
+      <div class="era-box"><i class="fas fa-helmet-battle"></i> Medieval</div>
+      <div class="era-box"><i class="fas fa-ship"></i> Renaissance</div>
+      <div class="era-box"><i class="fas fa-industry"></i> Modern</div>
+      <div class="era-box"><i class="fas fa-globe-americas"></i> Discoveries</div>
+      <div class="era-box"><i class="fas fa-microphone-alt"></i> Oral Histories</div>
+      <div class="era-box"><i class="fas fa-scroll"></i> Manuscripts</div>
+      <div class="era-box"><i class="fas fa-fist-raised"></i> Revolutions</div>
+      <div class="era-box"><i class="fas fa-chart-line"></i> Economic History</div>
+      <div class="era-box"><i class="fas fa-palette"></i> Art Movements</div>
+    </div>
+  </section>
+
+  <!-- SPOTLIGHT: Cleopatra, Leonardo, Churchill -->
+  <section class="mb-20 fade-up">
+    <div class="ornament mb-5"><span class="ornament-line"></span><i class="fas fa-crown text-[#8B3A3A] mx-2"></i><span class="ornament-line"></span></div>
+    <h2 class="section-title"><i class="fas fa-gem mr-2"></i> Portraits of Power · Figures Who Shaped the World</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+      <div class="vintage-card grid-hover overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=600&auto=format" class="w-full h-56 object-cover sepia-img" alt="Cleopatra VII marble bust">
+        <div class="p-5">
+          <span class="typewriter text-[#8B3A3A] text-xs">EGYPT · 30 BCE</span>
+          <h3 class="text-2xl font-bold mt-1">Cleopatra VII</h3>
+          <p class="text-sm mt-2 leading-relaxed">The last active ruler of the Ptolemaic Kingdom, a diplomat, linguist, and strategist who challenged Rome.</p>
+        </div>
+      </div>
+      <div class="vintage-card grid-hover overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1580137189272-c9379f8864fd?w=600&auto=format" class="w-full h-56 object-cover sepia-img" alt="Leonardo da Vinci sketch">
+        <div class="p-5">
+          <span class="typewriter text-[#8B3A3A] text-xs">RENAISSANCE · 1519</span>
+          <h3 class="text-2xl font-bold mt-1">Leonardo da Vinci</h3>
+          <p class="text-sm mt-2 leading-relaxed">Artist, inventor, anatomist: the epitome of the universal genius whose notebooks bridged art and science.</p>
+        </div>
+      </div>
+      <div class="vintage-card grid-hover overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1586444248902-2f0f58f0b56f?w=600&auto=format" class="w-full h-56 object-cover sepia-img" alt="Winston Churchill">
+        <div class="p-5">
+          <span class="typewriter text-[#8B3A3A] text-xs">WWII · 1940</span>
+          <h3 class="text-2xl font-bold mt-1">Winston Churchill</h3>
+          <p class="text-sm mt-2 leading-relaxed">Voice of defiance, orator, and leader whose words became a fortress during Britain's darkest hour.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG SECTION - FROM THE ARCHIVE (INITIAL 3 CARDS + SEE MORE BUTTON) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-8">
+    <div class="lg:col-span-2 fade-up">
+      <div class="ornament mb-5"><span class="ornament-line"></span><i class="fas fa-newspaper text-[#8B3A3A] mx-2"></i><span class="ornament-line"></span></div>
+      <div class="flex items-center justify-between mb-5 border-b-2 border-[#C2A46D] pb-3 flex-wrap gap-3">
+        <h2 class="text-4xl font-bold serif-heading tracking-wide">From the Archive</h2>
+        <div class="flex gap-2 flex-wrap">
+          <button data-filter="all" class="filter-btn typewriter text-xs px-4 py-2 border-2 border-[#2B2B2B] bg-[#F8F1E4] hover:bg-[#2B2B2B] hover:text-white transition-all shadow-sm">ALL</button>
+          <button data-filter="ancient" class="filter-btn typewriter text-xs px-4 py-2 border-2 border-[#2B2B2B] bg-[#F8F1E4] hover:bg-[#2B2B2B] hover:text-white transition-all">ANCIENT</button>
+          <button data-filter="medieval" class="filter-btn typewriter text-xs px-4 py-2 border-2 border-[#2B2B2B] bg-[#F8F1E4] hover:bg-[#2B2B2B] hover:text-white transition-all">MEDIEVAL</button>
+          <button data-filter="modern" class="filter-btn typewriter text-xs px-4 py-2 border-2 border-[#2B2B2B] bg-[#F8F1E4] hover:bg-[#2B2B2B] hover:text-white transition-all">MODERN</button>
+        </div>
+      </div>
+      <div id="articlesContainer" class="space-y-6"></div>
+      <!-- SEE MORE BUTTON (initially visible if more than 3 cards exist) -->
+      <div id="seeMoreWrapper" class="flex justify-center mt-8">
+        <button id="seeMoreBtn" class="see-more-btn typewriter text-sm px-6 py-3 border-2 border-[#8B3A3A] bg-[#F8F1E4] text-[#8B3A3A] hover:bg-[#2B2B2B] hover:text-white transition-all shadow-md flex items-center gap-2"><i class="fas fa-archive"></i> See more articles <i class="fas fa-caret-down"></i></button>
+      </div>
+    </div>
+    <!-- SIDEBAR -->
+    <div class="space-y-8 fade-up">
+      <div class="vintage-card p-6 border-l-8 border-l-[#8B3A3A] relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 text-6xl opacity-10"><i class="fas fa-calendar-alt"></i></div>
+        <h4 class="typewriter text-[#8B3A3A] text-lg flex items-center gap-2 mb-4"><i class="far fa-calendar-alt text-2xl"></i> ON THIS DAY</h4>
+        <div id="onThisDay" class="text-base leading-relaxed font-serif space-y-2"></div>
+        <div class="mt-4 typewriter text-[10px] text-right">— CHRONICLE ALMANAC</div>
+      </div>
+      <div class="vintage-card p-6">
+        <h4 class="typewriter text-[#2B2B2B] text-lg border-b-2 border-[#C2A46D] pb-2 mb-4"><i class="fas fa-tags text-[#8B3A3A] mr-2"></i>CATEGORIES</h4>
+        <ul id="categoryCountsList" class="space-y-3">
+          <li class="flex items-center gap-3"><i class="fas fa-scroll text-[#C2A46D] w-6"></i> Ancient <span id="ancientCount" class="ml-auto typewriter text-xs bg-[#EFE6D6] px-2 py-1">0</span></li>
+          <li class="flex items-center gap-3"><i class="fas fa-castle text-[#C2A46D] w-6"></i> Medieval <span id="medievalCount" class="ml-auto typewriter text-xs bg-[#EFE6D6] px-2 py-1">0</span></li>
+          <li class="flex items-center gap-3"><i class="fas fa-industry text-[#C2A46D] w-6"></i> Modern <span id="modernCount" class="ml-auto typewriter text-xs bg-[#EFE6D6] px-2 py-1">0</span></li>
+        </ul>
+      </div>
+      <div class="dark-card p-6 relative" style="background:#2B2B2B;">
+        <h4 class="typewriter text-[#C2A46D] text-lg"><i class="fas fa-envelope-open-text mr-2"></i>THE CHRONICLER</h4>
+        <p class="text-base text-[#e0d7c5] mt-3">Weekly historical despatches.</p>
+        <div class="mt-5 flex"><input type="text" placeholder="Your email address" class="bg-[#F8F1E4] px-4 py-2 text-sm w-full border-2 border-[#C2A46D]"><button class="bg-[#8B3A3A] text-white px-5 text-xl hover:bg-[#6a2c2c]"><i class="fas fa-paper-plane"></i></button></div>
+        <div class="stamp text-[#C2A46D] border-[#C2A46D] bottom-3">SUBSCRIBE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE and FOOTER -->
+  <section class="mt-20 mb-16 fade-up">
+    <div class="relative mb-12"><div class="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#C2A46D] to-transparent top-1/2"></div><h2 class="text-5xl font-bold text-center serif-heading tracking-wider bg-[#EFE6D6] px-6 inline-block relative left-1/2 -translate-x-1/2">HISTORICAL TIMELINE</h2></div>
+    <div class="relative mt-16"><div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-[#C2A46D] opacity-30"></div>
+      <div class="space-y-12">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 relative"><div class="md:w-1/2 md:text-right pr-8"><span class="typewriter text-[#8B3A3A] text-2xl font-bold block">753 BCE</span><h4 class="text-2xl font-bold">Founding of Rome</h4></div><div class="timeline-dot absolute left-4 md:left-1/2 transform -translate-x-1/2"></div><div class="md:w-1/2 pl-8 italic border-l-4 border-[#C2A46D]">"The city that would rule the ancient world."</div></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 relative"><div class="md:w-1/2 md:text-right pr-8"><span class="typewriter text-[#8B3A3A] text-2xl font-bold block">1215</span><h4 class="text-2xl font-bold">Magna Carta</h4></div><div class="timeline-dot absolute left-4 md:left-1/2 transform -translate-x-1/2"></div><div class="md:w-1/2 pl-8 italic border-l-4 border-[#C2A46D]">Foundation of constitutional liberties.</div></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 relative"><div class="md:w-1/2 md:text-right pr-8"><span class="typewriter text-[#8B3A3A] text-2xl font-bold block">1492</span><h4 class="text-2xl font-bold">Columbus & the New World</h4></div><div class="timeline-dot absolute left-4 md:left-1/2 transform -translate-x-1/2"></div><div class="md:w-1/2 pl-8 italic border-l-4 border-[#C2A46D]">Connecting continents, reshaping global history.</div></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 relative"><div class="md:w-1/2 md:text-right pr-8"><span class="typewriter text-[#8B3A3A] text-2xl font-bold block">1776</span><h4 class="text-2xl font-bold">American Revolution</h4></div><div class="timeline-dot absolute left-4 md:left-1/2 transform -translate-x-1/2"></div><div class="md:w-1/2 pl-8 italic border-l-4 border-[#C2A46D]">Declaration of Independence sparks a new republic.</div></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 relative"><div class="md:w-1/2 md:text-right pr-8"><span class="typewriter text-[#8B3A3A] text-2xl font-bold block">1789</span><h4 class="text-2xl font-bold">French Revolution</h4></div><div class="timeline-dot absolute left-4 md:left-1/2 transform -translate-x-1/2"></div><div class="md:w-1/2 pl-8 italic border-l-4 border-[#C2A46D]">Liberty, equality, fraternity — the age of upheaval.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bg-[#E8D8B5] p-8 text-center my-12"><i class="fas fa-quote-left text-4xl text-[#8C2F2F] opacity-40 mb-2"></i><div class="text-2xl italic font-serif max-w-3xl mx-auto">“History is written by the victors, but remembered by the curious.”</div><p class="mt-3 text-[#4B3A2F]">— Anonymous Chronicler</p></div>
+  <div class="bg-[#E8D8B5] border-2 border-[#4B3A2F] p-8 text-center"><h3 class="text-2xl font-bold">Subscribe to the Vault</h3><p class="mt-2">Receive weekly insights.</p><form class="flex gap-3 justify-center mt-4 flex-wrap"><input type="email" placeholder="Your email address" class="bg-[#F5ECD7] border border-[#4B3A2F] p-3 w-full max-w-sm font-mono"><button class="bg-[#4B3A2F] text-[#F5ECD7] px-8 py-3 font-serif">Subscribe <i class="fas fa-paper-plane"></i></button></form></div>
+
+  <footer class="mt-16 text-center typewriter text-xs text-[#5C5C5C] border-t-2 border-[#C2A46D] pt-8 pb-4">
+    <div class="ornament w-1/2 mx-auto mb-4"><span class="ornament-line"></span><i class="fas fa-landmark text-[#8B3A3A]"></i><span class="ornament-line"></span></div>
+    CHRONICLE · EST. 1892 · ALL RIGHTS RESERVED<br><span class="opacity-60">“History is a symphony of echoes”</span>
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div id="articleModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div class="article-modal w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 m-4">
+    <div class="flex justify-end"><button id="closeModal" class="text-3xl hover:text-[#8B3A3A]">&times;</button></div>
+    <div id="modalContent" class="prose prose-lg max-w-none font-serif"></div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ---------- EXPANDED ARCHIVE: 15 RICH CARDS (MORE STORIES) ----------
+    const articlesData = [
+      { id:1, title:'Secrets of the Silk Road', category:'ancient', date:'12 Mar 2025', excerpt:'Caravans, faiths, and empires intertwined across Central Asia.', content:'<h2>Secrets of the Silk Road</h2><p>The silk routes carried not only silk, but ideas, technologies, and plagues.</p><img src="https://images.unsplash.com/photo-1547235001-d703406d3f17?w=800&auto=format" class="w-full sepia-img my-4"><p>From Chang’an to Rome, merchants and monks exchanged more than goods.</p>' },
+      { id:2, title:'Knights & Chivalry', category:'medieval', date:'05 Apr 2025', excerpt:'Beyond the jousting: the code of honour and warfare.', content:'<h2>Knights & Chivalry</h2><p>Chivalry was a moral system that governed knightly conduct.</p><img src="https://images.unsplash.com/photo-1504887764023-6f27056d186c?w=800&auto=format" class="w-full sepia-img my-4"><p>Crusades and courtly love defined an era.</p>' },
+      { id:3, title:'Industrial Dawn', category:'modern', date:'21 Mar 2025', excerpt:'Steam, steel, and the reshaping of cities.', content:'<h2>The Industrial Revolution</h2><p>Factories rose, and with them a new social order.</p><img src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=800&auto=format" class="w-full sepia-img my-4"><p>Manchester, Pittsburgh, and the age of iron.</p>' },
+      { id:4, title:'Lost Library of Alexandria', category:'ancient', date:'18 Feb 2025', excerpt:'Knowledge lost in flames.', content:'<h2>The Great Library</h2><p>Scholars from across the Mediterranean gathered in Alexandria.</p><img src="https://images.unsplash.com/photo-1528127269322-539c7a960ab5?w=800&auto=format" class="w-full sepia-img my-4"><p>The repository of ancient wisdom, tragically burned.</p>' },
+      { id:5, title:'The Black Death', category:'medieval', date:'10 Apr 2025', excerpt:'The plague that reshaped Europe.', content:'<h2>1348 Pestilence</h2><p>Almost half of Europe perished, and the feudal order crumbled forever.</p><img src="https://images.unsplash.com/photo-1583324113626-70b0f8ca0d05?w=800&auto=format" class="w-full sepia-img my-4"><p>Flagellants and fragile economies transformed society.</p>' },
+      { id:6, title:'Wright Brothers & the Sky', category:'modern', date:'28 Mar 2025', excerpt:'The dawn of aviation.', content:'<h2>Kitty Hawk, 1903</h2><p>Twelve seconds of flight that changed the trajectory of the modern world.</p><img src="https://images.unsplash.com/photo-1534262517425-0d95e49a7be7?w=800&auto=format" class="w-full sepia-img my-4"><p>From biplanes to jets, a leap for mankind.</p>' },
+     
+    ];
+
+    const containerArticles = document.getElementById('articlesContainer');
+    const seeMoreBtn = document.getElementById('seeMoreBtn');
+    const seeMoreWrapper = document.getElementById('seeMoreWrapper');
+    let currentFilter = 'all';
+    let expanded = false;     // tracks if all cards are shown
+
+    // Helper: render based on current filter and expanded state
+    function renderArticles() {
+      const filtered = currentFilter === 'all' ? articlesData : articlesData.filter(a => a.category === currentFilter);
+      const limit = expanded ? filtered.length : 3;
+      const sliced = filtered.slice(0, limit);
+      
+      containerArticles.innerHTML = sliced.map(a => `
+        <div class="vintage-card p-6 grid-hover border-l-8 border-l-[#8B3A3A]">
+          <div class="flex justify-between flex-wrap gap-2"><h3 class="text-2xl font-bold">${a.title}</h3><span class="typewriter text-xs bg-[#EFE6D6] px-3 py-1">${a.date}</span></div>
+          <p class="mt-3">${a.excerpt}</p>
+          <button class="read-more mt-4 text-[#8B3A3A] typewriter text-sm border-b-2 border-[#8B3A3A]" data-id="${a.id}">READ <i class="fas fa-arrow-right text-xs"></i></button>
+        </div>
+      `).join('');
+      
+      // Show/hide "See more" button based on whether there are hidden items
+      if (filtered.length > 3 && !expanded) {
+        seeMoreWrapper.classList.remove('hidden');
+        seeMoreBtn.innerHTML = '<i class="fas fa-folder-open"></i> See more articles <i class="fas fa-caret-down"></i>';
+      } else if (expanded && filtered.length > 3) {
+        seeMoreWrapper.classList.remove('hidden');
+        seeMoreBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Show fewer articles <i class="fas fa-caret-up"></i>';
+      } else if (filtered.length <= 3) {
+        seeMoreWrapper.classList.add('hidden');
+      } else {
+        seeMoreWrapper.classList.remove('hidden');
+      }
+    }
+
+    // Toggle expand/collapse
+    function toggleExpand() {
+      const filtered = currentFilter === 'all' ? articlesData : articlesData.filter(a => a.category === currentFilter);
+      if (filtered.length <= 3) return;
+      expanded = !expanded;
+      renderArticles();
+    }
+
+    seeMoreBtn.addEventListener('click', toggleExpand);
+
+    // Filter buttons logic (reset expanded and re-render)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        currentFilter = this.dataset.filter;
+        expanded = false;   // reset to collapsed when filter changes
+        renderArticles();
+        // update active button style
+        document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('bg-[#2B2B2B]', 'text-white'); });
+        this.classList.add('bg-[#2B2B2B]', 'text-white');
+      });
+    });
+    
+    // Function to update category counts in sidebar
+    function updateCategoryCounts() {
+      const ancientNum = articlesData.filter(a=>a.category==='ancient').length;
+      const medievalNum = articlesData.filter(a=>a.category==='medieval').length;
+      const modernNum = articlesData.filter(a=>a.category==='modern').length;
+      document.getElementById('ancientCount').innerText = ancientNum;
+      document.getElementById('medievalCount').innerText = medievalNum;
+      document.getElementById('modernCount').innerText = modernNum;
+    }
+    
+    // Initial render
+    renderArticles();
+    updateCategoryCounts();
+    // default active "all" button highlight (already present from HTML)
+    document.querySelector('.filter-btn[data-filter="all"]').classList.add('bg-[#2B2B2B]','text-white');
+    
+    // Modal logic
+    const modal = document.getElementById('articleModal'), modalContent = document.getElementById('modalContent');
+    function openArticle(id) {
+      const art = articlesData.find(a=>a.id==id);
+      if(art) modalContent.innerHTML = `<div class="prose max-w-none font-serif">${art.content}<div class="mt-6 border-t pt-4 typewriter text-xs text-center">📜 CHRONICLE ARCHIVE · CERTIFIED</div></div>`;
+      else modalContent.innerHTML = `<div class="font-serif italic">Article missing from vault.</div>`;
+      modal.classList.remove('hidden'); document.body.style.overflow='hidden';
+    }
+    document.addEventListener('click', e => {
+      if(e.target.closest('.read-more')) {
+        const id = e.target.closest('.read-more').dataset.id;
+        if(id) openArticle(parseInt(id));
+      }
+      if(e.target.closest('.article-link')) {
+        e.preventDefault();
+        modalContent.innerHTML = `<h2 class="text-4xl font-bold">Life in Ancient Rome</h2><img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&auto=format" class="w-full sepia-img my-4"><p>The Roman day began at dawn with bread and political chatter. The Forum echoed with oratory, and the Colosseum roared. Gladiators, aqueducts, and the Pax Romana defined centuries.</p>`;
+        modal.classList.remove('hidden'); document.body.style.overflow='hidden';
+      }
+    });
+    document.getElementById('closeModal').addEventListener('click', ()=>{ modal.classList.add('hidden'); document.body.style.overflow=''; });
+    modal.addEventListener('click', e=>{ if(e.target===modal) { modal.classList.add('hidden'); document.body.style.overflow=''; } });
+    
+    // CTA card scroll
+    const ctaCard = document.querySelector('.grid .vintage-card:last-child');
+    if(ctaCard) ctaCard.addEventListener('click', ()=>{
+      if(currentFilter !== 'all') {
+        // reset filter to all and collapse view
+        currentFilter = 'all';
+        expanded = false;
+        renderArticles();
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('bg-[#2B2B2B]','text-white'));
+        document.querySelector('.filter-btn[data-filter="all"]').classList.add('bg-[#2B2B2B]','text-white');
+      } else {
+        if(expanded) expanded = false;
+        renderArticles();
+      }
+      window.scrollTo({ top: document.querySelector('#articlesContainer').offsetTop-80, behavior:'smooth' });
+    });
+    
+    // Intersection Observer for fade-up
+    const obs = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('visible'); }); }, {threshold:0.1});
+    document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+    setTimeout(()=>{ document.querySelectorAll('.fade-up').forEach(el=>{ if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible'); }); },100);
+    
+    // Date display
+    const d = new Date();
+    const formatted = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+    document.getElementById('vintageDate').innerHTML = `<i class="far fa-newspaper mr-1"></i> ${formatted} · EVENING`;
+    
+    // On this day
+    const onThisDayEvents = [
+      { month:4, day:16, text:'<span class="font-bold text-xl">1453</span> – Fall of Constantinople begins; the end of Byzantine era looms.' },
+      { month:4, day:16, text:'<span class="font-bold text-xl">1917</span> – Lenin returns to Russia from exile, igniting revolutionary fervour.' },
+      { month:4, day:16, text:'<span class="font-bold text-xl">1521</span> – Martin Luther appears before the Diet of Worms, refusing to recant.' }
+    ];
+    const today = new Date(); const m = today.getMonth()+1, day = today.getDate();
+    const todaysEvents = onThisDayEvents.filter(e => e.month === m && e.day === day);
+    const container = document.getElementById('onThisDay');
+    if(todaysEvents.length) {
+      container.innerHTML = todaysEvents.map(ev => `<div class="border-b border-[#C2A46D]/30 pb-2 mb-2 last:border-0">${ev.text}</div>`).join('');
+    } else {
+      container.innerHTML = '<div><span class="font-bold text-xl">1789</span> – The French Revolution gathers momentum.</div>';
+    }
+  })();
+</script>
+</body>
+</html>
